@@ -20,7 +20,7 @@ workflows:
           # myECRRepository
           repo: '${MY_APP_PREFIX}'
           # myECRRepoTag
-          tag: "$CIRCLE_SHA1"
+          tag: "newman-${CIRCLE_BUILD_NUM}"
 #       - aws-ecs/deploy-service-update:
 #           requires:
 #             - aws-ecr/build-and-push-image
