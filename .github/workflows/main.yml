@@ -1,36 +1,103 @@
-# This is a basic workflow to help you get started with Actions
-
-name: CI
-
-# Controls when the workflow will run
+name: Deploy to AWS ECS
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
   push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+    branches:
+      - UAT
+env:
+  AWS_REGION: ap-south-1
+  AWS_ACCOUNT_ID: <your AWS account ID>
+  IMAGE_REPO_NAME: <your Amazon ECR repository name>
+  SONAR_TOKEN: <your SonarQube token>
+  SERVICE: "sample"
+  CLUSTER_NAME: "sample"
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  build-and-deploy:
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
 
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
 
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+      - name: Build and tag Docker image
+        id: build-image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: false
+          tags: ${{ env.IMAGE_REPO_NAME }}:${{ github.sha }}
+      
+      - name: Commit Validation
+        id: Jira-Commit-Validate
+        run: | 
+          echo Commit Validation started on `date`..
+          commit_id=$(git log --format="%H" -n 1 | cut -c1-8) && echo $commit_id
+          repo_name=$(basename `git rev-parse --show-toplevel`) && echo $repo_name
+          author=$(git log -1 --pretty=format:'%an') && echo $author
+          commit_msg=$(git log -1 --pretty=%B) && echo $commit_msg
+          substring='#' && if echo "$commit_msg" | grep -q "$substring"; then echo "# is present"; else echo "# is not present" && aws sns publish --topic-arn $sns_commitval_arn --message "The commit submitted by '${author}' in '${repo_name}' does not match the required commit standard to be meet. The committed message is '${commit_msg}'. The correct format is 'issue-name# commit message'." && exit 1; fi
+          jira_issue=$(echo $commit_msg | cut -d "#" -f -1) && echo $jira_issue
+          curl -k -D- -u $auth -X GET -H "Content-Type:application/json" https://iljira.icicilombard.com/rest/api/latest/issue/$jira_issue | grep -q 'Issue Does Not Exist' && echo 'Issue Does Not Exist' && aws sns publish --topic-arn $sns_commitval_arn --message "The '${jira_issue}' submitted in '${repo_name}' by '${author}' is not found in Jira Server. " && exit 1 || exit 0
+          
+      - name: Build and push SonarQube scanner image
+        id: build-sonarqube
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+          docker build -t sonar-scanner .
+          docker tag sonar-scanner:latest sonar-scanner:${{ github.sha }}
+          docker tag sonar-scanner:latest <your Amazon ECR repository URL>/sonar-scanner:${{ github.sha }}
+          docker push <your Amazon ECR repository URL>/sonar-scanner:${{ github.sha }}
+      
+      - name: Ecr High & critical Vulnerablity scan
+        id: Ecr-Image-Scan
+        run: |
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          sudo ./aws/install
+          while [[ $(aws ecr describe-image-scan-findings --registry-id $ACCOUNT_ID --repository-name $ECR_REPO_NAME --image-id imageTag=$IMAGE_VERSION-$CODEBUILD_RESOLVED_SOURCE_VERSION --region $region | jq -r .imageScanStatus.status) != "COMPLETE" ]];
+          do
+            echo "SCAN IS NOT YET COMPLETE..."
+            sleep 10
+          done
+          sleep 5
+          ecr_report=$(aws ecr describe-image-scan-findings --registry-id $ACCOUNT_ID --repository-name $ECR_REPO_NAME --image-id imageTag=$IMAGE_VERSION-$CODEBUILD_RESOLVED_SOURCE_VERSION --region $region | grep -i findingSeverityCounts -A 6 | cut -d "{" -f2 | cut -d "}" -f1)
+          output=$(aws ecr describe-image-scan-findings --registry-id $ACCOUNT_ID --repository-name $ECR_REPO_NAME --image-id imageTag=$IMAGE_VERSION-$CODEBUILD_RESOLVED_SOURCE_VERSION --region $region)
+          high=$(echo $output | jq '.imageScanFindings.findingSeverityCounts.HIGH')
+          critical=$(echo $output | jq '.imageScanFindings.findingSeverityCounts.CRITICAL')
+          echo "HIGH : $high"
+          if [[ -z "$high" ]] || [[ "$high" -eq 0 ]]; then
+          vulnrHigh=0
+          echo "No high vulnerabilities found in $ECR_REPO_NAME repo with $IMAGE_VERSION-$CODEBUILD_RESOLVED_SOURCE_VERSION tag"
+          else
+          vulnrHigh=$high
+          echo "Found $vulnrHigh high vulnerabilities in $ECR_REPO_NAME repo with $IMAGE_VERSION-$CODEBUILD_RESOLVED_SOURCE_VERSION tag"
+          fi
+          if [[ $critical != *"CRITICAL"* ]] || [[ "$critical" -eq 0 ]]; then
+          vulnrCritical=0
+          echo "CRITICAL: $vulnrCritical"
+          echo "No critical vulnerabilities found in $ECR_REPO_NAME repo with $IMAGE_VERSION-$CODEBUILD_RESOLVED_SOURCE_VERSION tag"
+          else
+          vulnrCritical=$critical
+          echo "Found $vulnrCritical critical vulnerabilities in $ECR_REPO_NAME repo with $IMAGE_VERSION-$CODEBUILD_RESOLVED_SOURCE_VERSION tag"
+          fi
+          if [[ "$vulnrHigh" -eq 0 ]] && [[ "$vulnrCritical" -eq 0 ]]; then
+          result=$(echo "The image has matched the vulnerability check no new vulnerabilities has been introduced")
+          echo "$result"
+          else
+          result=$(echo "The Image named $IMAGE_VERSION-$CODEBUILD_RESOLVED_SOURCE_VERSION is vulnerable and having high vulnerabilities $vulnrHigh & critical vulnerabilities $vulnrCritical please check")
+          echo "$result"
+          aws sns publish --topic-arn $sns_topic_arn --message "The Image named $IMAGE_VERSION-$CODEBUILD_RESOLVED_SOURCE_VERSION is vulnerable and having high vulnerabilities $vulnrHigh & critical vulnerabilities $vulnrCritical please check"
+          exit 1;
+          fi
+
+      - name: Deploy to Amazon ECS
+        id: deploy-ecs
+        uses: aws-actions/amazon-ecs-deploy-task@v1
+        with:
+          cluster: <your Amazon ECS cluster name>
+          service: <your Amazon ECS service name>
+          task_definition: <your Amazon ECS task definition name>
+          container_name: <your Amazon ECS container name>
+          image: ${{ env.IMAGE_REPO_NAME }}:${{ github.sha }}
