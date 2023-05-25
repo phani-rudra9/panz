@@ -16,16 +16,16 @@ pipeline {
 //         '''
 //       }
 //     }
-    stage('Dotnet Publish') {
-      steps {
+//     stage('Dotnet Publish') {
+//       steps {
 	      
-        sh '''
-	 dotnet restore panz.csproj
-         dotnet build panz.csproj -c Release
-	 dotnet publish panz.csproj -c Release
-	'''
-      }   
-    }
+//         sh '''
+// 	 dotnet restore panz.csproj
+//          dotnet build panz.csproj -c Release
+// 	 dotnet publish panz.csproj -c Release
+// 	'''
+//       }   
+//     }
    stage('Docker build and push') {
       steps {
         sh '''
