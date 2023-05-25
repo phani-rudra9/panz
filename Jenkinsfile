@@ -42,7 +42,10 @@ pipeline {
       steps {
 	      
         sh '''
-	   kubectl apply -f deploy.yml
+           aws eks update-kubeconfig --name demo --regio ap-south-1
+           sed "s/buildNumber/${BUILD_NUMBER}/g" deploy.yml > deploy-new.yml
+	   kubectl apply -f deploy-new.yml
+	   kubectl apply -f svc.yml
 	'''
       }   
     }
