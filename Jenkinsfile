@@ -38,6 +38,14 @@ pipeline {
 	  '''
      }   
    }
+    stage('eks deploy') {
+      steps {
+	      
+        sh '''
+	   kubectl apply -f deploy.yml
+	'''
+      }   
+    }
     // stage('ecs deploy') {
     //   steps {
     //     sh '''
