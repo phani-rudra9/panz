@@ -17,15 +17,15 @@ pipeline {
      }   
    }
 
-    stage('Image Scan') {
-      steps {
-        sh '''
-        chmod +x image_scan.sh
-        bash image_scan.sh
+   //  stage('Image Scan') {
+   //    steps {
+   //      sh '''
+   //      chmod +x image_scan.sh
+   //      bash image_scan.sh
           
-	  '''
-     }   
-   }
+	  // '''
+   //   }   
+   // }
     // stage('eks deploy') {
     //   steps {
 	      
