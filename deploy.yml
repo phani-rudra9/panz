@@ -4,21 +4,21 @@ kind: Deployment
 
 metadata:
 
-  name: nginx-deployment
+  name: demo
 
   labels:
 
-    app: nginx
+    app: demo
 
 spec:
 
-  replicas: 3
+  replicas: 1
 
   selector:
 
     matchLabels:
 
-      app: nginx
+      app: demo
 
   template:
 
@@ -26,13 +26,13 @@ spec:
 
       labels:
 
-        app: nginx
+        app: demo
 
     spec:
 
       containers:
 
-      - name: nginx
+      - name: demo
 
         image: 971076122335.dkr.ecr.us-west-1.amazonaws.com/demo:dotnet-app-ChangebuildNumber
 
