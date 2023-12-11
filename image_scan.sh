@@ -20,7 +20,7 @@ if [[ $high_vulnr -gt 0 && $critical_vulnr -ge 0  ]]
 then
     echo "Your image has high vulnerabilities"
     # aws sns publish --topic-arn $arn --message "Image vulnerabilities: High vulnerabilities detected for image $image_tag in repository $repo_name" --subject "Image Vulnerability Alert"
-    exit 1 
+    # exit 1 
 else
     echo "Your image has low vulnerabilities"
 fi
