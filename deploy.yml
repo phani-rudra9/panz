@@ -34,7 +34,7 @@ spec:
 
       - name: demo
 
-        image: 971076122335.dkr.ecr.us-west-1.amazonaws.com/demo:dotnet-app-ChangebuildNumber
+        image: 971076122335.dkr.ecr.us-west-1.amazonaws.com/demo:demo-project-ChangebuildNumber
 
         ports:
 
