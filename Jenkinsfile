@@ -80,7 +80,7 @@ pipeline {
    stage('eks deploy') {
      steps {
        sh '''
-        aws eks update-kubeconfig --name demo --region us-east-2
+            aws eks update-kubeconfig --name sample --region us-east-2
   	    sed "s/changebuildnumber/${BUILD_NUMBER}/g" deploy.yml
   	    kubectl apply -f deploy.yml
   	    kubectl apply -f svc.yml
