@@ -1,8 +1,8 @@
 pipeline {
   agent any
-  triggers {
-    pollSCM '* * * * *'
-  }
+  // triggers {
+  //   pollSCM '* * * * *'
+  // }
   environment {
     BRANCH_NAME = "master"
     REPO_NAME = "panz"
