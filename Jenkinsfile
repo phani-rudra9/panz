@@ -6,7 +6,7 @@ pipeline {
   environment {
     BRANCH_NAME = "master"
     REPO_NAME = "panz"
-    SONAR_PROJECT_KEY = "dotnet-app"
+    SONAR_PROJECT_KEY = "demo"
     IMAGE_TAG = "demo-project-${BUILD_NUMBER}"
     DOCKER_REPO_URL = "971076122335.dkr.ecr.us-east-2.amazonaws.com"
     DOCKER_REPO_NAME = "demo"
@@ -25,7 +25,7 @@ pipeline {
       steps {
         sh '''
         export PATH="$PATH:/var/lib/jenkins/.dotnet/tools"
-      	dotnet sonarscanner begin /k:"$SONAR_PROJECT_KEY" /d:sonar.host.url="http://a73651e2fcb4a4f08acea3340884f16a-951601558.us-east-2.elb.amazonaws.com:9000/"  /d:sonar.login="$SONAR_TOKEN"
+      	dotnet sonarscanner begin /k:"$SONAR_PROJECT_KEY" /d:sonar.host.url="http://54.67.17.31:9000"  /d:sonar.login="$SONAR_TOKEN"
         dotnet build
         dotnet sonarscanner end /d:sonar.login="$SONAR_TOKEN"
   
