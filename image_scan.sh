@@ -5,24 +5,21 @@ image_tag=demo-project-${BUILD_NUMBER}
 critical_vulnr=$(aws ecr describe-image-scan-findings --repository-name $repo_name --image-id imageTag=$image_tag --region us-east-2 | grep -i "findingSeverityCounts" -A 5 | grep -i critical | cut -d ":" -f 2 | tr -d ",")
 high_vulnr=$(aws ecr describe-image-scan-findings --repository-name $repo_name --image-id imageTag=$image_tag --region us-east-2 | grep -i "findingSeverityCounts" -A 5 | grep -i high | cut -d ":" -f 2 | tr -d ",")
 
-if [ -z "$critical_vulnr" ]
-then
-        critical_vulnr=0
+if [ -z "$critical_vulnr" ]; then
+    critical_vulnr=0
 fi
 
-if [ -z "$high_vulnr" ]
-then
-        high_vulnr=0
+if [ -z "$high_vulnr" ]; then
+    high_vulnr=0
 fi
 
 echo "High vulnerabilities: $high_vulnr"
 echo "Critical vulnerabilities: $critical_vulnr"
 
-if [[ $high_vulnr -gt 0 && $critical_vulnr -ge 0 ]]
-then
-   echo "your image is having higher vulnerabilities,please check...."
-   #aws sns publish --topic-arn $arn --message "your image in this $repo_name repo in this $image_tag image is having higher vulnerabilities,please check..."
-#    exit 1
+if [[ $high_vulnr -gt 0 || $critical_vulnr -gt 0 ]]; then
+   echo "Your image is having vulnerabilities, please check...."
+   #aws sns publish --topic-arn $arn --message "Your image in this $repo_name repo with image tag $image_tag has vulnerabilities, please check..."
+   #exit 1
 else
-    echo "your image is safe for deployment"
+    echo "Your image is safe for deployment"
 fi
