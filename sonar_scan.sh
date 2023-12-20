@@ -1,5 +1,5 @@
 #!/bin/bash
-curl -u admin:rudra  http://54.67.17.31:9000/api/qualitygates/project_status?projectKey=demo > demo.json
+curl -u admin:nani http://demo-ecs-alb-579721728.us-east-2.elb.amazonaws.com:9000/api/qualitygates/project_status?projectKey=dotnet-app > demo.json
 sonar_scan=$(cat demo.json | grep -i status | cut -d ':' -f 3 | cut -d ',' -f 1 | tr -d '"')
 if [[ $sonar_scan -eq ok ]]
 then
