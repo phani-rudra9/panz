@@ -3,7 +3,7 @@
        { 
           
           "essential": true,
-          "image": "971076122335.dkr.ecr.ap-south-1.amazonaws.com/demo:SAMPLE-PROJECT-buildNumber",
+          "image": "971076122335.dkr.ecr.ap-south-1.amazonaws.com/demo:demo-project-buildNumber",
           "logConfiguration": { 
              "logDriver": "awslogs",
              "options": { 
@@ -12,7 +12,7 @@
                 "awslogs-stream-prefix": "ecs"
              }
           },
-          "name": "httpd",
+          "name": "demo",
           "portMappings": [ 
              { 
                 "containerPort": 80,
@@ -24,8 +24,8 @@
     ],
     "networkMode": "awsvpc",
     "cpu": "256",
-    "executionRoleArn": "arn:aws:iam::971076122335:role/ecs-task-role-new-demo",
-    "family": "demo-new",
+    "executionRoleArn": "arn:aws:iam::971076122335:role/ecsTaskExecutionRole",
+    "family": "demo8am-task-def",
     "memory": "1024",
     "requiresCompatibilities": [ 
         "FARGATE" 
