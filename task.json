@@ -3,7 +3,7 @@
        { 
           
           "essential": true,
-          "image": "971076122335.dkr.ecr.ap-south-1.amazonaws.com/demo:demo-project-buildNumber",
+          "image": "971076122335.dkr.ecr.us-east-2.amazonaws.com/demo:demo-project-buildNumber",
           "logConfiguration": { 
              "logDriver": "awslogs",
              "options": { 
