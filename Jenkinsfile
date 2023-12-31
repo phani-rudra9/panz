@@ -86,7 +86,7 @@ pipeline {
             aws eks update-kubeconfig --name sample --region us-east-2
   	    sed "s/changebuildnumber/${BUILD_NUMBER}/g" deploy.yml
   	    kubectl apply -f deploy.yml
-  	    kubectl apply -f svc.yml
+  	    // kubectl apply -f svc.yml
   
   	  '''
     }   
