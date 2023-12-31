@@ -1,41 +1,24 @@
 apiVersion: apps/v1
-
 kind: Deployment
-
 metadata:
-
-  name: demo
-
+  name: sample
   labels:
-
-    app: demo
-
+    app: sample
+    created_by: phani
 spec:
-
   replicas: 1
-
   selector:
-
     matchLabels:
-
-      app: demo
-
+      app: sample
+      created_by: phani
   template:
-
     metadata:
-
       labels:
-
-        app: demo
-
+        app: sample
+        created_by: phani
     spec:
-
       containers:
-
-      - name: demo
-
+      - name: sample
         image: 971076122335.dkr.ecr.us-west-1.amazonaws.com/demo:demo-project-ChangebuildNumber
-
         ports:
-
         - containerPort: 80
