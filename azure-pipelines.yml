@@ -1,3 +1,5 @@
+pool:  
+  name: local 
 trigger:
 - master
 resources:
