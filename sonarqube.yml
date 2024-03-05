@@ -3,7 +3,7 @@ phases:
   install:
     runtime-versions:
       php: 7.3
-      java: corretto11
+      java: corretto17
     commands:
       - echo "in the install phase"
     finally:
