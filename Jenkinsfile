@@ -24,6 +24,7 @@ pipeline {
    stage('sonar scanner') {
       steps {
         sh '''
+	dotnet tool install --global dotnet-sonarscanner --version 6.2.0
         export PATH="$PATH:/var/lib/jenkins/.dotnet/tools"
       	dotnet sonarscanner begin /k:"$SONAR_PROJECT_KEY" /d:sonar.host.url="$SONAR_HOST_URL" /d:sonar.login="$SONAR_TOKEN"
         dotnet build
