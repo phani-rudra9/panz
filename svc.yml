@@ -4,7 +4,7 @@ metadata:
   name: demo-service
 spec:
   selector:
-    app: demo
+    app: sample
   ports:
     - protocol: TCP
       port: 80
