@@ -12,14 +12,14 @@ phases:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...
-      - docker build -t  $REPOSITORY_URI:demo-ecs-app-${CODEBUILD_SOURCE_VERSION} .
+      - docker build -t  $REPOSITORY_URI:demo-ecs-app-${CODEBUILD_RESOLVED_SOURCE_VERSION} .
   post_build:
     commands:
       - echo Build completed on `date`
       - echo Pushing the Docker images...
-      - docker push $REPOSITORY_URI:demo-ecs-app-${CODEBUILD_SOURCE_VERSION}
+      - docker push $REPOSITORY_URI:demo-ecs-app-${CODEBUILD_RESOLVED_SOURCE_VERSION}
       - echo writing image definitions file...
-      - printf '[{"name":"demo","imageUri":"%s"}]' $REPOSITORY_URI:demo-ecs-app-${CODEBUILD_SOURCE_VERSION} > imagedefinitions.json
+      - printf '[{"name":"demo","imageUri":"%s"}]' $REPOSITORY_URI:demo-ecs-app-${CODEBUILD_RESOLVED_SOURCE_VERSION} > imagedefinitions.json
       - cat imagedefinitions.json 
       - pwd
 artifacts:
