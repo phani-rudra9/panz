@@ -1,6 +1,6 @@
 #!/bin/bash
 repo_name=demo
-image_tag=demo-ecs-app-${CODEBUILD_SOURCE_VERSION}
+image_tag=demo-ecs-app-${CODEBUILD_RESOLVED_SOURCE_VERSION}
 arn="arn:aws:sns:us-west-1:971076122335:7pm-topic"
 critical_vulnr=$(aws ecr describe-image-scan-findings --repository-name $repo_name --image-id imageTag=$image_tag --region us-east-2 | grep -i "findingSeverityCounts" -A 5 | grep -i critical | cut -d ":" -f 2 | tr -d ",")
 high_vulnr=$(aws ecr describe-image-scan-findings --repository-name $repo_name --image-id imageTag=$image_tag --region us-east-2 | grep -i "findingSeverityCounts" -A 5 | grep -i high | cut -d ":" -f 2 | tr -d ",")
