@@ -19,6 +19,6 @@ spec:
     spec:
       containers:
       - name: sample
-        image: 971076122335.dkr.ecr.us-east-2.amazonaws.com/cit-demo:demo-ecs-app-changebuildnumber
+        image: 971076122335.dkr.ecr.us-west-1.amazonaws.com/demo:demo-project-changebuildnumber
         ports:
         - containerPort: 80
