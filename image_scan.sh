@@ -3,7 +3,7 @@ repo_name=demo
 image_tag=demo-project-${BUILD_NUMBER}
 # image_tag=demo-ecs-app-${CODEBUILD_RESOLVED_SOURCE_VERSION}
 region=us-west-1
-arn="arn:aws:sns:us-west-1:971076122335:7pm-topic"
+arn="arn:aws:sns:us-west-1:971076122335:7am-demo"
 critical_vulnr=$(aws ecr describe-image-scan-findings --repository-name $repo_name --image-id imageTag=$image_tag --region $region | grep -i "findingSeverityCounts" -A 5 | grep -i critical | cut -d ":" -f 2 | tr -d ",")
 high_vulnr=$(aws ecr describe-image-scan-findings --repository-name $repo_name --image-id imageTag=$image_tag --region $region | grep -i "findingSeverityCounts" -A 5 | grep -i high | cut -d ":" -f 2 | tr -d ",")
 
