@@ -1,9 +1,7 @@
 #!/bin/bash
-export AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
-export AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-export AWS_DEFAULT_REGION=us-west-2
 repo_name=demo
-image_tag=demo-ecs-app-${CODEBUILD_RESOLVED_SOURCE_VERSION}
+image_tag=demo-project-${BUILD_NUMBER}
+# image_tag=demo-ecs-app-${CODEBUILD_RESOLVED_SOURCE_VERSION}
 region=us-west-1
 arn="arn:aws:sns:us-west-1:971076122335:7pm-topic"
 critical_vulnr=$(aws ecr describe-image-scan-findings --repository-name $repo_name --image-id imageTag=$image_tag --region $region | grep -i "findingSeverityCounts" -A 5 | grep -i critical | cut -d ":" -f 2 | tr -d ",")
