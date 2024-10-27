@@ -58,7 +58,7 @@ pipeline {
     stage('Image Scan') {
       steps {
         sh '''
-    	sleep 29
+    	sleep 30
         chmod +x image_scan.sh
         bash image_scan.sh     
 	  '''
