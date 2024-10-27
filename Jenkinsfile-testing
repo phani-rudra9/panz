@@ -1,0 +1,36 @@
+pipeline {
+    agent any
+
+    triggers {
+        pollSCM('* * * * *')
+    }
+
+    stages {
+        stage('Check for New Feature Branch') {
+            steps {
+                script {
+                    // Get the list of all remote branches
+                    def branches = sh(script: 'git branch -r', returnStdout: true).trim().tokenize('\n')
+                    // Filter branches that start with 'origin/feature'
+                    def featureBranches = branches.findAll { it.trim().startsWith('origin/feature') }
+                    // Get current local branches
+                    def currentBranches = sh(script: 'git branch --list', returnStdout: true).trim().tokenize('\n').collect { it.trim() }
+
+                    // Determine new feature branches
+                    def newFeatureBranches = featureBranches.findAll { branch -> 
+                        !currentBranches.contains(branch.replace('origin/', ''))
+                    }
+
+                    // Print greeting messages for new feature branches
+                    if (newFeatureBranches) {
+                        newFeatureBranches.each { branch ->
+                            echo "Hi! A new feature branch has been created: ${branch.replace('origin/', '')}"
+                        }
+                    } else {
+                        echo "No new feature branches."
+                    }
+                }
+            }
+        }
+    }
+}
