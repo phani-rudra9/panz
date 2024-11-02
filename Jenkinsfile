@@ -36,7 +36,7 @@ pipeline {
    stage('Sonar Quality Gate Check') {
       steps {
         sh '''
-	sleep 20
+	sleep 25
         chmod +x sonar_scan.sh
         bash sonar_scan.sh
           
