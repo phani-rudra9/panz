@@ -120,9 +120,6 @@
 
 
 
-
-
-
 pipeline {
   agent any
   triggers {
