@@ -144,6 +144,13 @@ pipeline {
     DOCKER_REPO_NAME = "demo"
   }
   stages {
+    stage('Debug Variables') {
+      steps {
+        script {
+          echo "Triggered by webhook. Extracted ref: ${env.ref}"
+        }
+      }
+    }
     stage('Git checkout') {
       steps {
         checkout([
@@ -151,9 +158,9 @@ pipeline {
             branches: [[name: "*/${BRANCH_NAME}"]],
             userRemoteConfigs: [[credentialsId: 'git-creds', url: "https://github.com/phani-rudra9/${REPO_NAME}"]]
         ])       
-     }   
-   }
-   stage('Sonar scanner') {
+      }   
+    }
+    stage('Sonar scanner') {
       steps {
         sh '''
         dotnet tool install --global dotnet-sonarscanner --version 6.2.0
@@ -162,18 +169,18 @@ pipeline {
         dotnet build
         dotnet sonarscanner end /d:sonar.login="$SONAR_TOKEN"
         '''
-     }   
-   }
-   stage('Sonar Quality Gate Check') {
+      }   
+    }
+    stage('Sonar Quality Gate Check') {
       steps {
         sh '''
         sleep 20
         chmod +x sonar_scan.sh
         bash sonar_scan.sh
         '''
-     }   
-   }
-   stage('Docker build and push') {
+      }   
+    }
+    stage('Docker build and push') {
       steps {
         sh '''
          whoami
@@ -182,20 +189,20 @@ pipeline {
          docker build -t $DOCKER_REPO_URL/$DOCKER_REPO_NAME:$IMAGE_TAG .
          docker push $DOCKER_REPO_URL/$DOCKER_REPO_NAME:$IMAGE_TAG
         '''
-     }   
-   }
-   stage('Image Scan') {
+      }   
+    }
+    stage('Image Scan') {
       steps {
         sh '''
         sleep 25
         chmod +x image_scan.sh
         bash image_scan.sh     
         '''
-     }   
-   }
-   stage('eks deploy') {
-     steps {
-       sh '''
+      }   
+    }
+    stage('eks deploy') {
+      steps {
+        sh '''
         export AWS_ACCESS_KEY_ID=$Access_Key
         export AWS_SECRET_ACCESS_KEY=$Secret_Key
         export AWS_DEFAULT_REGION=us-east-2
@@ -203,7 +210,7 @@ pipeline {
         sed "s/changebuildnumber/${BUILD_NUMBER}/g" deploy.yml
         kubectl apply -f deploy.yml
         '''
-    }   
+      }   
+    }
   }
-}
 }
