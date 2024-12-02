@@ -120,12 +120,14 @@
 
 
 
+
+
 pipeline {
   agent any
   triggers {
     GenericTrigger(
         genericVariables: [
-            [key: 'ref', value: '$.ref', defaultValue: '']
+            [key: 'ref', value: '$.ref', expressionType: 'JSONPath', defaultValue: '']
         ],
         causeString: 'Triggered by GitHub webhook for ref $ref',
         token: 'jhdbjfbjsfbkabDbjdjdnniudd',
@@ -147,7 +149,7 @@ pipeline {
     stage('Debug Variables') {
       steps {
         script {
-          echo "Triggered by webhook. Extracted ref: ${env.ref}"
+          echo "Extracted ref: ${env.ref}"
         }
       }
     }
