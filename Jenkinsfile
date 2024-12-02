@@ -131,7 +131,7 @@ pipeline {
             [key: 'ref', value: '$.ref', defaultValue: '']
         ],
         causeString: 'Triggered by GitHub webhook for ref $ref',
-        token: 'tknstrgfrintcetmntep',
+        token: 'jhdbjfbjsfbkabDbjdjdnniudd',
         printContributedVariables: true,
         printPostContent: true,
         regexpFilterText: '$ref',
