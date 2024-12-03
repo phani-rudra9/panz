@@ -3,12 +3,11 @@ import os
 import re
 
 def sanitize_name(name):
-    # Replace invalid characters with hyphens and truncate to 32 characters
     return re.sub(r'[^a-zA-Z0-9\-]', '-', name)[:32]
 
 def main():
     branch_name = os.getenv('BRANCH_NAME', 'feature/demo1')[:32]
-    sanitized_branch_name = sanitize_name(branch_name)  # Sanitize branch name
+    sanitized_branch_name = sanitize_name(branch_name)
     instance_id = os.getenv('INSTANCE_ID', 'i-0123456789abcdef0')
     hosted_zone_id = os.getenv('HOSTED_ZONE_ID')
     alb_dns = os.getenv('ALB_DNS')
@@ -37,7 +36,7 @@ def main():
 
     try:
         tg_response = elb_client.create_target_group(
-            Name=f"{sanitized_branch_name}-tg",  # Use sanitized branch name
+            Name=f"{sanitized_branch_name}-tg",
             Protocol='HTTP',
             Port=6543,
             VpcId=vpc_id,
